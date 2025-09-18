@@ -1,21 +1,29 @@
 {
-	"name": "ESP-IDF QEMU",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-	"customizations": {
-		"vscode": {
-			"settings": {
-				"terminal.integrated.defaultProfile.linux": "bash",
-				"idf.espIdfPath": "/opt/esp/idf",
-				"idf.toolsPath": "/opt/esp",
-				"idf.gitPath": "/usr/bin/git"
-			},
-			"extensions": [
-				"espressif.esp-idf-extension",
-				"espressif.esp-idf-web"
-			]
-		}
-	},
-	"runArgs": ["--privileged"]
+  "name": "ESP-IDF-Container",
+  "image": "espressif/idf:latest",
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "mounts": ["source=extensionCache,target=/root/.vscode-server/extensions,type=volume"],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "espressif.esp-idf-extension",
+        "espressif.esp-idf-web",
+        "llvm-vs-code-extensions.vscode-clangd" 
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "idf.espIdfPath": "/opt/esp/idf",
+        "idf.toolsPath": "/opt/esp",
+        "idf.gitPath": "/usr/bin/git"
+      }
+    }
+  },
+
+  "runArgs": ["--privileged"],
+
+  "postCreateCommand": "bash -lc 'apt-get update && apt-get install -y clangd && echo ready'",
+  "postAttachCommand": "bash -lc 'source /opt/esp/idf/export.sh && cd \"$WORKSPACE_FOLDER\" && idf.py reconfigure || true'"
 }
