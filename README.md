@@ -1,32 +1,7 @@
-# _Sample project_
+# Overview
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+This project was developed as part of the **PCS3858 - Laboratório de Sistemas Embarcados** class undertaken during the 2025.1 semester.
 
-This is the simplest buildable example. The example is used by command `idf.py create-project`
-that copies the project to user specified path and set it's name. For more information follow the [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project)
+The goal of the project was to build a LED cube: a set of LEDs arranged in a three-dimensional array, that can then be used to produce passive or interactive animations. Ideally, the arrangement is such that you can manipulate each LED independently. For this project, we decided to build an 8x8x8 cube, thus requiring 512 LEDs in total.
 
-
-
-## How to use example
-We encourage the users to use the example as a template for the new projects.
-A recommended way is to follow the instructions on a [docs page](https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/build-system.html#start-a-new-project).
-
-## Example folder contents
-
-The project **sample_project** contains one source file in C language [main.c](main/main.c). The file is located in folder [main](main).
-
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt`
-files that provide set of directives and instructions describing the project's source files and targets
-(executable, library, or both). 
-
-Below is short explanation of remaining files in the project folder.
-
-```
-├── CMakeLists.txt
-├── main
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
-```
-Additionally, the sample project contains Makefile and component.mk files, used for the legacy Make based build system. 
-They are not used or needed when building with CMake and idf.py.
+This repository documents the firmware that drives the cube and generates the animations. Although much of the overall effort in this project went into assembling its physical structure &mdash; soldering the LEDs into 1D lines, then 2D frames, and finally the 3D cube &mdash; that work is outside the scope of this repository.

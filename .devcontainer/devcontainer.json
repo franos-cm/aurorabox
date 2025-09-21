@@ -1,19 +1,19 @@
 {
   "name": "ESP-IDF-Container",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "mounts": ["source=extensionCache,target=/root/.vscode-server/extensions,type=volume"],
-
+  "mounts": [
+    "source=extensionCache,target=/root/.vscode-server/extensions,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
         "espressif.esp-idf-extension",
         "espressif.esp-idf-web",
-        "llvm-vs-code-extensions.vscode-clangd" 
+        "llvm-vs-code-extensions.vscode-clangd"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
@@ -23,11 +23,12 @@
       }
     }
   },
-
-  "runArgs": ["--privileged", "--volume=/dev:/dev"],
+  "runArgs": [
+    "--privileged",
+    "--volume=/dev:/dev"
+  ],
   "postStartCommand": "bash -lc '.devcontainer/detect-serial.sh'",
   "postAttachCommand": "bash -lc 'source /opt/esp/idf/export.sh && cd \"${containerWorkspaceFolder}\" && idf.py reconfigure || true; bash .devcontainer/detect-serial.sh --workspace \"${containerWorkspaceFolder}\" --apply-shell'",
-
   "containerEnv": {
     "ESPTOOL_PORT": ""
   }
