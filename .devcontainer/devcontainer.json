@@ -1,6 +1,8 @@
 {
   "name": "ESP-IDF-Container",
-  "image": "espressif/idf:latest",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -22,8 +24,11 @@
     }
   },
 
-  "runArgs": ["--privileged"],
+  "runArgs": ["--privileged", "--volume=/dev:/dev"],
+  "postStartCommand": "bash -lc '.devcontainer/detect-serial.sh'",
+  "postAttachCommand": "bash -lc 'source /opt/esp/idf/export.sh && cd \"${containerWorkspaceFolder}\" && idf.py reconfigure || true; bash .devcontainer/detect-serial.sh --workspace \"${containerWorkspaceFolder}\" --apply-shell'",
 
-  "postCreateCommand": "bash -lc 'apt-get update && apt-get install -y clangd && echo ready'",
-  "postAttachCommand": "bash -lc 'source /opt/esp/idf/export.sh && cd \"$WORKSPACE_FOLDER\" && idf.py reconfigure || true'"
+  "containerEnv": {
+    "ESPTOOL_PORT": ""
+  }
 }
