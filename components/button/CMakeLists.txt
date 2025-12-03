@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "rain.cpp"
+    SRCS "button.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES cube utils
+    REQUIRES driver esp_timer
 )
