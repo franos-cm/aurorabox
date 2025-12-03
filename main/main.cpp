@@ -1,3 +1,4 @@
+#include "button.hpp"
 #include "cube.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -22,6 +23,10 @@ extern "C" void app_main(void) {
     ESP_ERROR_CHECK(cube.clear());
     vTaskDelay(pdMS_TO_TICKS(1000));
 
+    // --- init button: GPIO0, pull-up, active-low, falling-edge ---
+    ESP_ERROR_CHECK(button_init(GPIO_NUM_2, /*pull_up=*/true));
+    SemaphoreHandle_t btn_sem = button_get_semaphore();
+
     // --- animation states ---
     static LightRainAnim light_rain;
     static HeavyRainAnim heavy_rain;
@@ -37,18 +42,12 @@ extern "C" void app_main(void) {
     IAnimation *current = animations[current_index];
     current->init(cube);
 
-    // debug
-    int steps_in_mode = 0;
-
     while (true) {
         // 1) Run one frame of the current animation
         current->step(cube);
-        steps_in_mode++;
 
-        // 2) Fake "button": change animation every 5000 frames
-        if (steps_in_mode >= 5000) {
-            steps_in_mode = 0;
-
+        // 2) Non-blocking check for button press
+        if (xSemaphoreTake(btn_sem, 0) == pdTRUE) {
             current_index = (current_index + 1) % ANIM_COUNT;
             current = animations[current_index];
             current->init(cube);
