@@ -1,4 +1,6 @@
 #include "button.hpp"
+#include "circle.hpp"
+#include "countdown.hpp"
 #include "cube.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -6,8 +8,14 @@
 
 using namespace cube;
 using namespace rain_animation;
+using namespace countdown_animation;
+using namespace circle_animation;
 
 extern "C" void app_main(void) {
+    // Global brightness configuration (0–100%)
+    const float brightness_percent = 30.0f; // tweak as desired
+    const float brightness_factor = brightness_percent / 100.0f;
+
     PanelChainConfig chains[] = {
         {.pin = 5, .panels = 4, .first_row_backwards = false},
         {.pin = 14, .panels = 4, .first_row_backwards = false},
@@ -20,6 +28,9 @@ extern "C" void app_main(void) {
                         .panels_height = K_MAX_HEIGHT};
     Cube cube(args);
 
+    // Apply global brightness to all subsequent animation output
+    cube.set_global_brightness(brightness_factor);
+
     ESP_ERROR_CHECK(cube.clear());
     vTaskDelay(pdMS_TO_TICKS(1000));
 
@@ -30,9 +41,11 @@ extern "C" void app_main(void) {
     // --- animation states ---
     static LightRainAnim light_rain;
     static HeavyRainAnim heavy_rain;
+    static CountdownAnim countdown;
+    static CircleSpinAnim circle_spin;
 
     IAnimation *animations[] = {
-        &light_rain, &heavy_rain,
+        &light_rain, &heavy_rain, &countdown, &circle_spin,
         // later: add &plane_sweep, &plasma, ...
     };
     constexpr int ANIM_COUNT = sizeof(animations) / sizeof(animations[0]);

@@ -130,7 +130,18 @@ esp_err_t Cube::poke(uint32_t x, uint32_t y, uint32_t z, rgb_t v) {
 
     const uint32_t led = base + idx;
 
-    esp_err_t err = led_strip_set_pixel(h, led, v.r, v.g, v.b);
+    // Apply global brightness scaling here
+    uint8_t r = v.r;
+    uint8_t g = v.g;
+    uint8_t b = v.b;
+    if (global_brightness_ >= 0.0f && global_brightness_ < 1.0f) {
+        float f = global_brightness_;
+        r = static_cast<uint8_t>(static_cast<float>(r) * f);
+        g = static_cast<uint8_t>(static_cast<float>(g) * f);
+        b = static_cast<uint8_t>(static_cast<float>(b) * f);
+    }
+
+    esp_err_t err = led_strip_set_pixel(h, led, r, g, b);
     if (err != ESP_OK) return err;
 
     chain_dirty_[ci] = true;

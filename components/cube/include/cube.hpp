@@ -88,6 +88,13 @@ class Cube {
     const PanelChainConfig *chains() const { return chains_; }
     size_t chain_count() const { return chain_count_; }
 
+    // Set global brightness factor in [0.0, 1.0]; applied to all pixels at output time.
+    void set_global_brightness(float factor) {
+        if (factor < 0.0f) factor = 0.0f;
+        if (factor > 1.0f) factor = 1.0f;
+        global_brightness_ = factor;
+    }
+
     // ----------------- Control APIs -----------------
     PixelProxy operator()(uint32_t x, uint32_t y, uint32_t z) {
         assert(z < total_faces_ && y < panels_height_ && x < panels_width_);
@@ -110,6 +117,9 @@ class Cube {
     size_t panels_width_ = 0;
     size_t panels_height_ = 0;
     uint32_t pixels_per_face_ = 0;
+
+    // Global brightness factor in [0.0, 1.0], applied in poke()
+    float global_brightness_ = 1.0f;
 
     // Backend: up to 4 chains for RMT. Each chain has its own strip handle and
     // max_leds
