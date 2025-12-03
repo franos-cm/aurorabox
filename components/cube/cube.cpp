@@ -1,6 +1,7 @@
 // Cube implementation with RMT backend only for now
-#include "include/cube.hpp"
+#include "cube.hpp"
 #include "led_strip.h"
+#include "soc/soc_caps.h"
 #include <assert.h>
 #include <string.h>
 
@@ -37,12 +38,15 @@ Cube::Cube(const CubeCreateArgs &args)
             led_strip_rmt_config_t rc = {};
             rc.clk_src = RMT_CLK_SRC_DEFAULT;
             rc.resolution_hz = RMT_HZ;
-            rc.mem_block_symbols = 0; // default
-            rc.flags.with_dma = 0;    // C6: no RMT-DMA
+            rc.mem_block_symbols = SOC_RMT_MEM_WORDS_PER_CHANNEL; // default
+            rc.flags.with_dma = 0;                                // C6: no RMT-DMA
 
             led_strip_handle_t handle;
             esp_err_t err = led_strip_new_rmt_device(&sc, &rc, &handle);
-            assert(err == ESP_OK && "failed to create RMT led strip");
+            if (err != ESP_OK) {
+                printf("Cube: led_strip_new_rmt_device failed on chain %d: err=0x%x\n", (int)i, (unsigned)err);
+                assert(false && "failed to create RMT led strip");
+            }
             handles_[i] = handle;
             (void)faces_base; // reserved if we later track per-chain face offsets
             faces_base += ch.panels;
@@ -115,7 +119,15 @@ esp_err_t Cube::poke(uint32_t x, uint32_t y, uint32_t z, rgb_t v) {
 
     const uint32_t local_face = z - faces_before;
     const uint32_t base = local_face * pixels_per_face_;
-    const uint32_t idx = serpentine_index(x, y, chains_[ci].first_row_backwards);
+    uint32_t idx = serpentine_index(x, y, chains_[ci].first_row_backwards);
+
+    // Even faces (0, 2...) are filled normally.
+    // Odd faces (1, 3...) are filled in reverse order because the chain
+    // snakes from the end of the previous face into the "end" of the current face.
+    if (local_face % 2 != 0) {
+        idx = (pixels_per_face_ - 1) - idx;
+    }
+
     const uint32_t led = base + idx;
 
     esp_err_t err = led_strip_set_pixel(h, led, v.r, v.g, v.b);

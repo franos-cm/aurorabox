@@ -1,9 +1,12 @@
 #pragma once
 #include "esp_err.h"
+#include "utils.hpp"
 #include <stddef.h>
 #include <stdint.h>
 
 namespace cube {
+
+using namespace utils;
 
 // Constants for a standard 8x8x8 cube
 #define RMT_HZ (10 * 1000 * 1000)
@@ -12,12 +15,6 @@ namespace cube {
 #define K_MAX_PANELS 8
 #define K_MAX_WIDTH 8
 #define K_MAX_HEIGHT 8
-
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} rgb_t;
 
 // Backend selection for the LED strip driver
 enum class Backend : uint8_t { RMT = 0, SPI = 1 };

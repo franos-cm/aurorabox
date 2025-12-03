@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "cube.cpp"
+    SRCS "animations.cpp"
     INCLUDE_DIRS "include"
-    REQUIRES led_strip utils
+    REQUIRES cube utils
 )
