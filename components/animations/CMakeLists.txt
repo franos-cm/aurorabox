@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "animations.cpp"
+    SRCS "rain.cpp"
     INCLUDE_DIRS "include"
     REQUIRES cube utils
 )
